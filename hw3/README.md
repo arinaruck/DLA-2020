@@ -1,3 +1,5 @@
+## DLA hw3. Keyword spotting
+
 This is a KWS model you can train to spot the name of your favourite assistant.
 The model is based on https://www.dropbox.com/s/22ah2ba7dug6pzw/KWS_Attention.pdf
 
@@ -12,3 +14,5 @@ python main.py datapath model_checkpoint_path
 If you wand to use the pretrained model, you can load it from checkpoint.pt
 To see how the model performes on your audio fork the repo and do
 python run your_filepath model_checkpoint_path
+
+You can look into the code with some examples in dla_hw3.ipynb
