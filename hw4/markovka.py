@@ -12,6 +12,8 @@ import torchaudio
 import librosa
 from matplotlib import pyplot as plt
 import sys
+from google_drive_downloader import GoogleDriveDownloader as gdd
+
 sys.path.append('./waveglow')
 
 import warnings
@@ -84,7 +86,14 @@ class Vocoder(nn.Module):
     def __init__(self):
         super(Vocoder, self).__init__()
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        model = torch.load('../input/dlaht4dataset/waveglow_256channels_universal_v5.pt', map_location=device)['model']
+        try:
+            model = torch.load('./waveglow_256channels_universal_v5.pt', map_location=device)['model']
+        except:
+            #load pretrained weights
+            gdd.download_file_from_google_drive(file_id='1rpK8CzAAirq9sWZhe9nlfvxMF1dRgFbF',
+                                                dest_path='./waveglow_256channels_universal_v5.pt')
+
+            model = torch.load('./waveglow_256channels_universal_v5.pt', map_location=device)['model']
         self.net = model.remove_weightnorm(model)
     
     @torch.no_grad()
