@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from easydict import EasyDict as edict
+from dataclasses import dataclass
 from torch.nn.init import calculate_gain
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler, random_split
@@ -10,7 +11,7 @@ import os
 from torch.nn.utils.rnn import pad_sequence
 from tqdm.notebook import tqdm
 from itertools import islice
-
+import numpy as np
 
 class ConvLayer(nn.Module):
 

@@ -1,4 +1,5 @@
 from easydict import EasyDict as edict
+import torch
 
 def make_config():
     config = {

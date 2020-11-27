@@ -9,7 +9,8 @@ import os
 from torch.nn.utils.rnn import pad_sequence
 from tqdm.notebook import tqdm
 from itertools import islice
-
+import wandb
+import numpy as np
 import torch.nn as nn
 from config import make_config
 from load_data import LJSpeech, make_loader

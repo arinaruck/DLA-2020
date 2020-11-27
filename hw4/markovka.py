@@ -1,5 +1,4 @@
 import wandb
-from IPython import display
 from dataclasses import dataclass
 
 import torch
