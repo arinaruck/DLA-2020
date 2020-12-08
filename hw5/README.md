@@ -13,4 +13,6 @@ wandb login your_key
 python main.py
 ```
 
+To use the trained model use the inference method on your melspectrogram
+
 You can look into the code with some examples in dla_hw5.ipynb
