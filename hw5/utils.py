@@ -73,11 +73,29 @@ class EarlyStopping:
         self.val_loss_min = val_loss
 
 
-def load_checkpoint(checkpoint, model, optimizer, scheduler)
+def load_checkpoint(checkpoint, model, optimizer, scheduler):
     checkpoint = torch.load(checkpoint)
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
     return model, optimizer, scheduler
 
+
+def make_config():
+    config = {
+            'n_mels': 80,
+            'diliation_cycle': 8,
+            'n_blocks': 16,
+            'audio_channels': 256,
+            'residual_channels': 120,
+            'skip_channels': 240,
+            'upsample_k_size': 512,
+            'hop_len': 256,
+            'mu': 256,
+            'embed_k_size': 512,
+            'device': torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'),
+            'batch_size': 8,
+            'epochs': 3
+    }
+    return config
 

@@ -7,6 +7,7 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler, random_split
 import string
 import os
+import torchaudio
 from torch.nn.utils.rnn import pad_sequence
 from tqdm.notebook import tqdm
 from itertools import islice
@@ -47,6 +48,7 @@ class WaveNet(nn.Module):
         super().__init__()
         k_sz = config.upsample_k_size
         self.r = config.residual_channels
+        self.embed_k_size = config.embed_k_size
         self.decode = torchaudio.transforms.MuLawDecoding(quantization_channels=config.mu)
         
         self.upsample_net = nn.ConvTranspose1d(in_channels=config.n_mels, out_channels=config.n_mels,
@@ -73,7 +75,7 @@ class WaveNet(nn.Module):
         wav = (wav.unsqueeze(1)).type(torch.float)
         
         mel = self.upsample_net(mel)
-        out = self.causal_conv(wav)[:, :, : -(config.embed_k_size - 1)]
+        out = self.causal_conv(wav)[:, :, : -(self.embed_k_size - 1)]
         b_sz, r, seq_len = out.shape
         res = torch.zeros((b_sz, 2 * r, seq_len)).to(mel.device)
         for block in self.blocks:
@@ -92,7 +94,7 @@ class WaveNet(nn.Module):
         res_wav = torch.zeros(b_sz, 1, 1).to(mel.device)
         for i in range(seq_len):
             mel_in = mel[:, :, i].unsqueeze(-1)
-            out = self.causal_conv(curr_wav)[:, :, : -(config.embed_k_size - 1)]
+            out = self.causal_conv(curr_wav)[:, :, : -(self.embed_k_size - 1)]
             res = torch.zeros((b_sz, 2 * self.r, 1)).to(mel.device)
             for block in self.blocks:
                 out, skip = block(mel_in, out)

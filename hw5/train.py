@@ -7,8 +7,10 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler, random_split
 import string
 import os
+import wandb
+import torchaudio
 from torch.nn.utils.rnn import pad_sequence
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 from itertools import islice
 
 from markovka import MelSpectrogram, MelSpectrogramConfig
@@ -23,8 +25,8 @@ def train(config, model, optimizer, scheduler, early_stopping, train_loader, val
     mu_law = torchaudio.transforms.MuLawEncoding(quantization_channels=config.mu)
     featurizer = MelSpectrogram(MelSpectrogramConfig()).to(device)
     for epoch in range(epochs):
-        train_epoch(train_loader, model, optimizer, scheduler, device, criterion, featurizer, mu_law)
-        val_epoch(val_loader, model, optimizer, scheduler, early_stopping, device, criterion,
+        train_epoch(config, train_loader, model, optimizer, scheduler, device, criterion, featurizer, mu_law)
+        val_epoch(config, val_loader, model, optimizer, scheduler, early_stopping, device, criterion,
                   featurizer, mu_law, epoch)
         torch.save({
             'model_state_dict': model.state_dict(),
@@ -35,12 +37,10 @@ def train(config, model, optimizer, scheduler, early_stopping, train_loader, val
             break
 
 
-def train_epoch(train_loader, model, optimizer, scheduler, device, criterion,
+def train_epoch(config, train_loader, model, optimizer, scheduler, device, criterion,
                 featurizer, mu_law, grad_acum=1):
     model.train()
     tr_loss, tr_steps = 0, 0
-    mu_law = torchaudio.transforms.MuLawEncoding(quantization_channels=config.mu)
-    featurizer = MelSpectrogram(MelSpectrogramConfig()).to(device)
     for audio in tqdm(train_loader):
         audio = audio.to(device)
         quantized_audio = mu_law(audio)
@@ -50,7 +50,6 @@ def train_epoch(train_loader, model, optimizer, scheduler, device, criterion,
         loss = criterion(pred_class.contiguous().view(-1, config.mu), audio_out.view(-1))
         tr_loss += loss.item()
         loss.backward()
-        #torch.nn.utils.clip_grad_norm_(model.parameters(), 10.0)
         tr_steps += 1
         wandb.log({'loss/train' : tr_loss / tr_steps})
         if (tr_steps % grad_acum) == 0:
@@ -59,7 +58,7 @@ def train_epoch(train_loader, model, optimizer, scheduler, device, criterion,
                 
 
 @torch.no_grad()         
-def val_epoch(val_loader, model, optimizer, scheduler, early_stopping, device, criterion, 
+def val_epoch(config, val_loader, model, optimizer, scheduler, early_stopping, device, criterion, 
               featurizer, mu_law, epoch):
     model.eval()
     val_loss, val_steps = 0, 0

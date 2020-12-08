@@ -1,0 +1,29 @@
+torch==1.7.0
+torchaudio==0.7.0
+easydict
+librosa
+
+# hw5/markovka.py: 2
+ipython == 7.16.1
+
+# hw5/markovka.py: 14
+matplotlib == 3.2.2
+
+# hw5/markovka.py: 7
+numpy == 1.18.5
+
+# hw5/load_data.py: 5
+# hw5/main.py: 7
+# hw5/model.py: 6
+# hw5/train.py: 6
+pandas == 1.0.5
+
+# hw5/load_data.py: 10
+# hw5/main.py: 12
+# hw5/model.py: 11
+# hw5/train.py: 11
+tqdm == 4.47.0
+
+# hw5/main.py: 1
+# hw5/markovka.py: 1
+wandb == 0.10.11

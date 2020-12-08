@@ -1,5 +1,7 @@
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
+import torchaudio
 from easydict import EasyDict as edict
 from torch.nn.init import calculate_gain
 import pandas as pd
@@ -59,13 +61,13 @@ class LJSpeech(Dataset):
         return len(self.files)
 
 
-def load_data(datapath):
+def load_data(datapath, config):
     dataset = LJSpeech(datapath, 'metadata.csv')
     full_ds_size = len(dataset)
     train_size, test_size = int(0.9 * 0.8 * full_ds_size), int(0.1 * full_ds_size) 
     val_size = full_ds_size - train_size - test_size
     train_ds, val_ds, test_ds = random_split(dataset, lengths=[train_size, val_size, test_size])
-    bs = config.batch_size
+    bs = config['batch_size']
     train_loader = DataLoader(train_ds, batch_size=bs, num_workers=3, pin_memory=True)
     val_loader = DataLoader(val_ds, batch_size=bs, num_workers=3, pin_memory=True)
     test_loader =DataLoader(test_ds, batch_size=bs, num_workers=3, pin_memory=True)
